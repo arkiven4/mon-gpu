@@ -42,5 +42,5 @@ sudo crontab -e
 * * * * * /usr/bin/python3 /path/to/client.py --server_ip serverIP:Port --remark Example-remark
 
 # if server 232 is still running:
-# * * * * * /usr/bin/python3 /path/to/client.py --163.221.176.232:8081 --remark Example-remark
+# * * * * * /usr/bin/python3 /path/to/client.py --server_ip 163.221.176.232:8081 --remark Example-remark
 ```
