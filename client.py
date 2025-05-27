@@ -8,7 +8,7 @@ class GPUMonitor:
     """ get GPU information periodically, and send it to the server """
     def __init__(self, remark, server_ip):
         """
-        remark: str, the name of the local machine
+        remark: str, some additional infomation
         server_ip: str, the IP address of the server to send GPU information
         """
         self.hostname = socket.gethostname()
