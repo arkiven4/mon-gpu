@@ -17,7 +17,7 @@ class GPUMonitor:
         self.UNIT = 1024 * 1024 * 1024  # Unit for memory in GB
         self.SUFFIX = 'GB'
         pynvml.nvmlInit()
-        self.gpu_driver_info = pynvml.nvmlSystemGetDriverVersion()
+        self.gpu_driver_info = str(pynvml.nvmlSystemGetDriverVersion())
         self.gpu_device_count = pynvml.nvmlDeviceGetCount()
         self.gpu_info = [dict() for _ in range(self.gpu_device_count+1)]
         self.gpu_info[0]["hostname"] = self.hostname
@@ -35,12 +35,12 @@ class GPUMonitor:
             handle = pynvml.nvmlDeviceGetHandleByIndex(i-1)
             memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
             gpu_name = str(pynvml.nvmlDeviceGetName(handle))
-            gpu_temperature = pynvml.nvmlDeviceGetTemperature(handle, 0)
+            gpu_temperature = str(pynvml.nvmlDeviceGetTemperature(handle, 0))
             try:
-                gpu_fan_speed = pynvml.nvmlDeviceGetFanSpeed(handle)
+                gpu_fan_speed = str(pynvml.nvmlDeviceGetFanSpeed(handle))
             except pynvml.NVMLError as e:
                 gpu_fan_speed = "Not Supported"
-            gpu_power_state = pynvml.nvmlDeviceGetPowerState(handle)
+            gpu_power_state = str(pynvml.nvmlDeviceGetPowerState(handle))
             gpu_util_rate = pynvml.nvmlDeviceGetUtilizationRates(handle).gpu
             gpu_memory_rate = pynvml.nvmlDeviceGetUtilizationRates(handle).memory
 
