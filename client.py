@@ -17,7 +17,7 @@ class GPUMonitor:
         self.UNIT = 1024 * 1024 * 1024  # Unit for memory in GB
         self.SUFFIX = 'GB'
         pynvml.nvmlInit()
-        self.gpu_driver_info = str(pynvml.nvmlSystemGetDriverVersion())
+        self.gpu_driver_info = pynvml.nvmlSystemGetDriverVersion()
         self.gpu_device_count = pynvml.nvmlDeviceGetCount()
         self.gpu_info = [dict() for _ in range(self.gpu_device_count+1)]
         self.gpu_info[0]["hostname"] = self.hostname
@@ -34,7 +34,7 @@ class GPUMonitor:
         for i in range(1, self.gpu_device_count+1):
             handle = pynvml.nvmlDeviceGetHandleByIndex(i-1)
             memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
-            gpu_name = str(pynvml.nvmlDeviceGetName(handle))
+            gpu_name = pynvml.nvmlDeviceGetName(handle)
             gpu_temperature = str(pynvml.nvmlDeviceGetTemperature(handle, 0))
             try:
                 gpu_fan_speed = str(pynvml.nvmlDeviceGetFanSpeed(handle))
