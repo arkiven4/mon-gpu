@@ -70,7 +70,7 @@ class GPUMonitor:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GPU Monitor")
     parser.add_argument("--remark", type=str, default="", help="remark")
-    parser.add_argument("--server_ip", type=str, required=True, help="Server IP address to send GPU information")
+    parser.add_argument("--server_ip", type=str, default="163.221.176.232:8081", help="Server IP address to send GPU information")
     args = parser.parse_args()
 
     gpu_monitor = GPUMonitor(args.remark, args.server_ip)
