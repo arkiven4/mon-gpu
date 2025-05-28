@@ -116,7 +116,7 @@ def visual():
     </html>
     """
     # Sort the data by hostname
-    data_sorted = {k: data_from_servers[k] for k in sorted(data_from_servers.keys())}
+    data_sorted = {k: v for k, v in sorted(data_from_servers.items(), key=lambda item: item[1]['hostname'])}
     # search the offline servers by update_time
     return render_template_string(html, data=data_sorted)
 
