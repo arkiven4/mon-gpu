@@ -21,21 +21,21 @@ def receive_gpu_info():
 
     update_time = basic_info.get('update_time', 'unknown')
 
-    id = f"{hostname}_{ip}"
+    sid = ip
     # if hostname not in data_from_servers:
-    data_from_servers[id] = {}
-    data_from_servers[id]['hostname'] = hostname
-    data_from_servers[id]['remark'] = remark
-    data_from_servers[id]['ip'] = ip
-    data_from_servers[id]['update_time'] = update_time
-    data_from_servers[id]['driver_version'] = basic_info.get('driver_version', 'unknown')
-    if data_from_servers[id]['driver_version'].startswith('b\''):
-        data_from_servers[id]['driver_version'] = data_from_servers[id]['driver_version'][2:-1]
-    data_from_servers[id]['gpus'] = []
+    data_from_servers[sid] = {}
+    data_from_servers[sid]['hostname'] = hostname
+    data_from_servers[sid]['remark'] = remark
+    data_from_servers[sid]['ip'] = ip
+    data_from_servers[sid]['update_time'] = update_time
+    data_from_servers[sid]['driver_version'] = basic_info.get('driver_version', 'unknown')
+    if data_from_servers[sid]['driver_version'].startswith('b\''):
+        data_from_servers[sid]['driver_version'] = data_from_servers[sid]['driver_version'][2:-1]
+    data_from_servers[sid]['gpus'] = []
     for gpu_info in gpu_data[1:]:
         if gpu_info['name'].startswith('b\''):
             gpu_info['name'] = gpu_info['name'][2:-1]
-        data_from_servers[id]['gpus'].append(gpu_info)
+        data_from_servers[sid]['gpus'].append(gpu_info)
 
     return jsonify({"status": "success"}), 200
 
