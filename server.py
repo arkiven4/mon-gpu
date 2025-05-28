@@ -94,6 +94,8 @@ def visual():
     </body>
     </html>
     """
+    # Sort the data by hostname
+    data_sorted = {k: data_from_servers[k] for k in sorted(data_from_servers.keys())}
     return render_template_string(html, data=data_from_servers)
 
 if __name__ == '__main__':
