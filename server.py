@@ -29,16 +29,13 @@ def receive_gpu_info():
     data_from_servers[id]['ip'] = ip
     data_from_servers[id]['update_time'] = update_time
     data_from_servers[id]['driver_version'] = basic_info.get('driver_version', 'unknown')
+    if data_from_servers[id]['driver_version'].startswith('b\''):
+        data_from_servers[id]['driver_version'] = data_from_servers[id]['driver_version'][2:-1]
     data_from_servers[id]['gpus'] = []
     for gpu_info in gpu_data[1:]:
+        if gpu_info['name'].startswith('b\''):
+            gpu_info['name'] = gpu_info['name'][2:-1]
         data_from_servers[id]['gpus'].append(gpu_info)
-        
-    # data_from_servers[id].insert(0, {
-    #     "hostname": hostname,
-    #     "remark": remark,
-    #     "ip": ip,
-    #     "update_time": update_time
-    # })
 
     return jsonify({"status": "success"}), 200
 
@@ -58,7 +55,7 @@ def visual():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>GPU Monitor Visualization</title>
+        <title>GPU Monitor</title>
         <style>
             body { font-family: Arial, sans-serif; margin: 40px; }
             table { border-collapse: collapse; width: 100%; }
@@ -67,10 +64,19 @@ def visual():
         </style>
     </head>
     <body>
-        <h2>GPU Information from Clients</h2>
+        <h2>GPU Monitor</h2>
         {% if data %}
             {% for server, info in data.items() %}
-                <h3>{{ server }} {{ info['remark'] }} (driver_version: {{ info['driver_version'] }}) reported at {{ info['update_time'] }}</h3>
+                <h4>
+                {{ info['hostname'] }}
+                (<span class="copyText" style="color:blue;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>, {{ info['driver_version'] }})
+                @{{ info['update_time'] }}
+                <span style="color:orange;">{{ info['remark'] }}</span>
+                {% if info['remark2'] %}
+                    <span style="color: red;">{{ info['remark2'] }}</span>
+                {% endif %}
+                </h4>
+                
                 <table>
                     <tr>
                         {% if info['gpus'] and info['gpus'][0] %}
@@ -91,12 +97,48 @@ def visual():
         {% else %}
             <p>No GPU data available.</p>
         {% endif %}
+        
+        <script>
+            setInterval(function() {
+                window.location.reload();
+            }, 30000); // 60000 毫秒 = 60 秒
+            
+            const ips = document.querySelectorAll('.copyText');
+            ips.forEach(ip => {
+                ip.onclick = function() {
+                    // need https
+                    navigator.clipboard.writeText(this.innerText);
+                };
+            });
+            
+        </script>
     </body>
     </html>
     """
     # Sort the data by hostname
     data_sorted = {k: data_from_servers[k] for k in sorted(data_from_servers.keys())}
-    return render_template_string(html, data=data_from_servers)
+    # search the offline servers by update_time
+    return render_template_string(html, data=data_sorted)
+
+# search the offline servers by update_time periodically
+import threading
+import time
+from datetime import datetime
+def search_offline_servers():
+    """
+    Periodically check for offline servers and remove them from the data.
+    """
+    global data_from_servers
+    while True:
+        # Check for servers that haven't updated in the last 30s
+        current_time = time.time()
+        offline_servers_id = [k for k, v in data_from_servers.items() if current_time - datetime.strptime(v.get('update_time', 0),"%Y-%m-%d %H:%M:%S").timestamp() >= 120]
+        for server_id in offline_servers_id:
+            data_from_servers[server_id]['remark2'] = 'OFFLINE'
+        threading.Event().wait(60)  # Wait for 30s before checking again
+
 
 if __name__ == '__main__':
+    # Start the thread to search for offline servers
+    threading.Thread(target=search_offline_servers, daemon=True).start()
     app.run(host='0.0.0.0', port=8081, debug=False)
