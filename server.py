@@ -67,7 +67,7 @@ def visual():
         <h2>GPU Monitor</h2>
         {% if data %}
             {% for server, info in data.items() %}
-                <h4>
+                <h3 style="margin-bottom: 0px;">
                 {{ info['hostname'] }}
                 (<span class="copyText" style="color:blue;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>, {{ info['driver_version'] }})
                 @{{ info['update_time'] }}
@@ -75,7 +75,7 @@ def visual():
                 {% if info['remark2'] %}
                     <span style="color: red;">{{ info['remark2'] }}</span>
                 {% endif %}
-                </h4>
+                </h3>
                 
                 <table>
                     <tr>
