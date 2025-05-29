@@ -79,8 +79,11 @@ def visual():
     </head>
     <body>
         <h2>GPU Monitor</h2>
-        <a href='/ssh_config?proxy=false&username=your_username'>Get SSH Config (No Proxy)</a>
-        <a href='/ssh_config?proxy=true&username=your_username'>Get SSH Config (Proxy)</a>
+        <p>Get SSH Config -->
+        <a href='/ssh_config?proxy=false&username=your_username'>No Proxy</a>
+        <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
+        </p>
+        
         {% if data %}
             {% for server, info in data.items() %}
                 <h3 style="margin-bottom: 0px;">
