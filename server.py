@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, render_template_string
+from server_utils import generate_ssh_config, ssh_config_to_string
 
 app = Flask(__name__)
 data_from_servers = dict()  # Store GPU data in memory
@@ -46,6 +47,19 @@ def index():
     """
     return jsonify(data_from_servers)
 
+@app.route('/ssh_config', methods=['GET'])
+def ssh_config():
+    """
+    Generate SSH config entries for the servers and return them as a string.
+    """
+    username = request.args.get('username', 'your_username')
+    useNaistProxy = request.args.get('proxy', 'false').lower() == 'true'
+
+    data_sorted = {k: v for k, v in sorted(data_from_servers.items(), key=lambda item: item[1]['hostname'])}
+    ssh_config_entries = generate_ssh_config(data_sorted, username, useNaistProxy)
+    ssh_config_string = ssh_config_to_string(ssh_config_entries)
+    
+    return str(ssh_config_string), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 @app.route('/', methods=['GET'])
 def visual():
     """
@@ -65,6 +79,8 @@ def visual():
     </head>
     <body>
         <h2>GPU Monitor</h2>
+        <a href='/ssh_config'>Get SSH Config (No Proxy)</a>
+        <a href='/ssh_config?proxy=true'>Get SSH Config (Proxy)</a>
         {% if data %}
             {% for server, info in data.items() %}
                 <h3 style="margin-bottom: 0px;">
