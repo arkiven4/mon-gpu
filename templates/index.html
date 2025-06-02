@@ -30,8 +30,12 @@
 <body>
     <h2>GPU Monitor</h2>
     {% if data %}
+    <p>Get SSH Config -->
+        <a href='/ssh_config?proxy=false&username=your_username'>No Proxy</a>
+        <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
+    </p>
     {% for server, info in data.items() %}
-    <h4 style="margin-bottom: 0px;">
+    <h3 style="margin-bottom: 0px;">
         {{ info['hostname'] }}
         (<span class="copyText" style="color:blue;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>, {{
         info['driver_version'] }})
@@ -40,7 +44,7 @@
         {% if info['remark2'] %}
         <span style="color: red;">{{ info['remark2'] }}</span>
         {% endif %}
-    </h4>
+    </h3>
 
     <table>
         <tr>
