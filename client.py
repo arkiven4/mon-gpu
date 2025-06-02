@@ -53,8 +53,8 @@ class GPUMonitor:
                 for process in processes:
                     pid = process.pid
                     used_memory = process.usedGpuMemory // 1024 // 1024 // 1024  # 转换为 GB
-                    
                     command = self.get_process_command(pid)
+                    print(command)
                     self.gpu_info[0]['processes'].append({
                         'pid': pid,
                         'cuda': i-1,
@@ -68,7 +68,7 @@ class GPUMonitor:
             self.gpu_info[i]['name'] = f"{gpu_name}"
             self.gpu_info[i]['memory_usage'] = f"{used_memory}/{total_memory}{self.SUFFIX}"
             self.gpu_info[i]['temperature'] = f"{gpu_temperature}°C"
-            self.gpu_info[i]['fan_speed'] = f"{gpu_fan_speed}"
+            self.gpu_info[i]['fan_speed'] = f"{gpu_fan_speed}%"
             self.gpu_info[i]['power_state'] = f"{gpu_power_state}"
             self.gpu_info[i]['gpu_utilization'] = f"{gpu_util_rate}%"
             self.gpu_info[i]['memory_utilization'] = f"{gpu_memory_rate}%"

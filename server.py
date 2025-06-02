@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, render_template_string, render_template
+import argparse
 
 app = Flask(__name__)
 data_from_servers = dict()  # Store GPU data in memory
@@ -91,5 +92,9 @@ def search_offline_servers():
 
 if __name__ == '__main__':
     # Start the thread to search for offline servers
+    praser = argparse.ArgumentParser(description='GPU Monitoring Server')
+    praser.add_argument('--port', type=int, default=8081, help='Port to run the server on')
+
+    port = praser.parse_args().port
     threading.Thread(target=search_offline_servers, daemon=True).start()
-    app.run(host='0.0.0.0', port=8082, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)

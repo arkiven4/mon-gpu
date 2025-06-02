@@ -1,17 +1,14 @@
-<h1>Processes on Server: {{ server_id }}</h1>
 <table>
     <tr>
-        <th>PID</th>
-        <th>CUDA</th>
-        <th>Command</th>
-        <th>Used Memory</th>
+        {% for keys in processes[0].keys() %}
+        <th>{{ keys }}</th>
+        {% endfor %}
     </tr>
     {% for process in processes %}
     <tr>
-        <td>{{ process.pid }}</td>
-        <td>{{ process.cuda }}</td>
-        <td>{{ process.command }}</td>
-        <td>{{ process.used_memory }}</td>
+        {% for value in process.values() %}
+        <td>{{ value }}</td>
+        {% endfor %}
     </tr>
     {% endfor %}
 </table>
