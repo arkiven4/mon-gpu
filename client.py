@@ -4,6 +4,8 @@ import requests
 import argparse
 import time
 
+import psutil
+
 class GPUMonitor:
     """ get GPU information periodically, and send it to the server """
     def __init__(self, remark, server_ip):
@@ -24,6 +26,7 @@ class GPUMonitor:
         self.gpu_info[0]["remark"] = self.remark
         self.gpu_info[0]["driver_version"] = self.gpu_driver_info
         self.gpu_info[0]['update_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.gpu_info[0]['processes'] = []  # Initialize processes list for the first element
         self.get_gpu_info()
 
     def __del__(self):
@@ -43,7 +46,22 @@ class GPUMonitor:
             gpu_power_state = str(pynvml.nvmlDeviceGetPowerState(handle))
             gpu_util_rate = pynvml.nvmlDeviceGetUtilizationRates(handle).gpu
             gpu_memory_rate = pynvml.nvmlDeviceGetUtilizationRates(handle).memory
-
+            
+            processes = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
+            if processes:
+                # print("正在运行的进程:")
+                for process in processes:
+                    pid = process.pid
+                    used_memory = process.usedGpuMemory // 1024 // 1024 // 1024  # 转换为 GB
+                    
+                    command = self.get_process_command(pid)
+                    self.gpu_info[0]['processes'].append({
+                        'pid': pid,
+                        'cuda': i-1,
+                        'command': command,
+                        'used_memory': f"{used_memory}GB"
+                    })
+                
             used_memory = round(memory_info.used / self.UNIT, 2)
             total_memory = round(memory_info.total / self.UNIT, 2)
             self.gpu_info[i]["index"] = i-1
@@ -54,6 +72,24 @@ class GPUMonitor:
             self.gpu_info[i]['power_state'] = f"{gpu_power_state}"
             self.gpu_info[i]['gpu_utilization'] = f"{gpu_util_rate}%"
             self.gpu_info[i]['memory_utilization'] = f"{gpu_memory_rate}%"
+            
+    @staticmethod 
+    def get_process_command(pid):
+        try:
+            # 根据 PID 获取进程对象
+            process = psutil.Process(pid)
+            # 获取进程的命令行指令
+            cmdline = process.cmdline()
+            if cmdline:
+                return ' '.join(cmdline)
+            else:
+                return "无法获取命令行信息（可能是权限问题或进程已结束）"
+        except psutil.NoSuchProcess:
+            return f"进程 {pid} 不存在"
+        except psutil.AccessDenied:
+            return f"无法访问进程 {pid} 的信息（权限不足）"
+        except Exception as e:
+            return f"获取进程信息时出错: {e}"        
 
     def send_gpu_info(self):
         """ Send GPU information to the server """

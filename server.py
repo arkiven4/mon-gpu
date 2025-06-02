@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request, render_template_string
-from server_utils import generate_ssh_config, ssh_config_to_string
+from flask import Flask, jsonify, request, render_template_string, render_template
 
 app = Flask(__name__)
 data_from_servers = dict()  # Store GPU data in memory
@@ -32,6 +31,9 @@ def receive_gpu_info():
     data_from_servers[sid]['driver_version'] = basic_info.get('driver_version', 'unknown')
     if data_from_servers[sid]['driver_version'].startswith('b\''):
         data_from_servers[sid]['driver_version'] = data_from_servers[sid]['driver_version'][2:-1]
+    
+    data_from_servers[sid]['processes'] = basic_info.get('processes', [])
+    
     data_from_servers[sid]['gpus'] = []
     for gpu_info in gpu_data[1:]:
         if gpu_info['name'].startswith('b\''):
@@ -47,98 +49,28 @@ def index():
     """
     return jsonify(data_from_servers)
 
-@app.route('/ssh_config', methods=['GET'])
-def ssh_config():
-    """
-    Generate SSH config entries for the servers and return them as a string.
-    """
-    username = request.args.get('username', 'your_username')
-    useNaistProxy = request.args.get('proxy', 'false').lower() == 'true'
-
-    data_sorted = {k: v for k, v in sorted(data_from_servers.items(), key=lambda item: item[1]['hostname'])}
-    ssh_config_entries = generate_ssh_config(data_sorted, username, useNaistProxy)
-    ssh_config_string = ssh_config_to_string(ssh_config_entries)
-    
-    return str(ssh_config_string), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 @app.route('/', methods=['GET'])
 def visual():
     """
     Render a simple HTML page to visualize GPU information.
     """
-    html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>GPU Monitor</title>
-        <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-            th { background: #eee; }
-        </style>
-    </head>
-    <body>
-        <h2>GPU Monitor</h2>
-        <p>Get SSH Config -->
-        <a href='/ssh_config?proxy=false&username=your_username'>No Proxy</a>
-        <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
-        </p>
-        
-        {% if data %}
-            {% for server, info in data.items() %}
-                <h3 style="margin-bottom: 0px;">
-                {{ info['hostname'] }}
-                (<span class="copyText" style="color:blue;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>, {{ info['driver_version'] }})
-                @{{ info['update_time'] }}
-                <span style="color:orange;">{{ info['remark'] }}</span>
-                {% if info['remark2'] %}
-                    <span style="color: red;">{{ info['remark2'] }}</span>
-                {% endif %}
-                </h3>
-                
-                <table>
-                    <tr>
-                        {% if info['gpus'] and info['gpus'][0] %}
-                            {% for key in info['gpus'][0].keys() %}
-                                <th>{{ key }}</th>
-                            {% endfor %}
-                        {% endif %}
-                    </tr>
-                    {% for gpu in info['gpus'] %}
-                        <tr>
-                            {% for value in gpu.values() %}
-                                <td>{{ value }}</td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% endfor %}
-        {% else %}
-            <p>No GPU data available.</p>
-        {% endif %}
-        
-        <script>
-            setInterval(function() {
-                window.location.reload();
-            }, 30000); // 60000 毫秒 = 60 秒
-            
-            const ips = document.querySelectorAll('.copyText');
-            ips.forEach(ip => {
-                ip.onclick = function() {
-                    // need https
-                    navigator.clipboard.writeText(this.innerText);
-                };
-            });
-            
-        </script>
-    </body>
-    </html>
-    """
     # Sort the data by hostname
     data_sorted = {k: v for k, v in sorted(data_from_servers.items(), key=lambda item: item[1]['hostname'])}
-    # search the offline servers by update_time
-    return render_template_string(html, data=data_sorted)
+    return render_template('index.html', data=data_sorted)
 
+@app.route('/processes', methods=['GET'])
+def show_processes():
+    """
+    Display the processes running on the specified Server.
+    """
+    server_id = request.args.get('id')
+    if not server_id or server_id not in data_from_servers.keys():
+        return jsonify({"error": "Server ID not found"}), 404
+    
+    processes = data_from_servers[server_id].get('processes', [])
+    return render_template('processes.html', server_id=server_id, processes=processes)
+
+    
 # search the offline servers by update_time periodically
 import threading
 import time
@@ -160,4 +92,4 @@ def search_offline_servers():
 if __name__ == '__main__':
     # Start the thread to search for offline servers
     threading.Thread(target=search_offline_servers, daemon=True).start()
-    app.run(host='0.0.0.0', port=8081, debug=False)
+    app.run(host='0.0.0.0', port=8082, debug=False)

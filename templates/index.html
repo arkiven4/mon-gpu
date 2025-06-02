@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GPU Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>GPU Monitor</h2>
+    {% if data %}
+    {% for server, info in data.items() %}
+    <h4>
+        {{ info['hostname'] }}
+        (<span class="copyText" style="color:blue;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>, {{
+        info['driver_version'] }})
+        @{{ info['update_time'] }}
+        <span style="color:orange;">{{ info['remark'] }}</span>
+        {% if info['remark2'] %}
+        <span style="color: red;">{{ info['remark2'] }}</span>
+        {% endif %}
+    </h4>
+
+    <table>
+        <tr>
+            {% if info['gpus'] and info['gpus'][0] %}
+            {% for key in info['gpus'][0].keys() %}
+            <th>{{ key }}</th>
+            {% endfor %}
+            {% endif %}
+        </tr>
+        {% for gpu in info['gpus'] %}
+        <tr>
+            {% for value in gpu.values() %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+
+    </table>
+    {% endfor %}
+    {% else %}
+    <p>No GPU data available.</p>
+    {% endif %}
+
+    <script>
+        setInterval(function () {
+            window.location.reload();
+        }, 30000); // 60000 毫秒 = 60 秒
+
+        const ips = document.querySelectorAll('.copyText');
+        ips.forEach(ip => {
+            ip.onclick = function () {
+                // need https
+                navigator.clipboard.writeText(this.innerText);
+            };
+        });
+
+    </script>
+</body>
+
+</html>
