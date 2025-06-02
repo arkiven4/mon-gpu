@@ -31,7 +31,7 @@
     <h2>GPU Monitor</h2>
     {% if data %}
     {% for server, info in data.items() %}
-    <h4>
+    <h4 style="margin-bottom: 0px;">
         {{ info['hostname'] }}
         (<span class="copyText" style="color:blue;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>, {{
         info['driver_version'] }})

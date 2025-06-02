@@ -4,7 +4,7 @@ import requests
 import argparse
 import time
 
-import psutil
+import subprocess
 
 class GPUMonitor:
     """ get GPU information periodically, and send it to the server """
@@ -48,13 +48,13 @@ class GPUMonitor:
             gpu_memory_rate = pynvml.nvmlDeviceGetUtilizationRates(handle).memory
             
             processes = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
+            # print(f"processes: {processes}")
             if processes:
-                # print("正在运行的进程:")
                 for process in processes:
                     pid = process.pid
                     used_memory = process.usedGpuMemory // 1024 // 1024 // 1024  # 转换为 GB
                     command = self.get_process_command(pid)
-                    print(command)
+                    # print(command)
                     self.gpu_info[0]['processes'].append({
                         'pid': pid,
                         'cuda': i-1,
@@ -72,25 +72,39 @@ class GPUMonitor:
             self.gpu_info[i]['power_state'] = f"{gpu_power_state}"
             self.gpu_info[i]['gpu_utilization'] = f"{gpu_util_rate}%"
             self.gpu_info[i]['memory_utilization'] = f"{gpu_memory_rate}%"
-            
-    @staticmethod 
+    
+    @staticmethod
     def get_process_command(pid):
         try:
-            # 根据 PID 获取进程对象
-            process = psutil.Process(pid)
-            # 获取进程的命令行指令
-            cmdline = process.cmdline()
-            if cmdline:
-                return ' '.join(cmdline)
+            # 使用 ps 命令获取进程的命令行
+            result = subprocess.run(['ps', '-p', str(pid), '-o', 'cmd'], 
+                                    capture_output=True, text=True)
+            output = result.stdout.strip().split('\n')
+            if len(output) > 1:
+                return output[1]  # 第一行是标题，第二行是命令
             else:
-                return "无法获取命令行信息（可能是权限问题或进程已结束）"
-        except psutil.NoSuchProcess:
-            return f"进程 {pid} 不存在"
-        except psutil.AccessDenied:
-            return f"无法访问进程 {pid} 的信息（权限不足）"
+                return f"进程 {pid} 不存在或无法获取信息"
         except Exception as e:
-            return f"获取进程信息时出错: {e}"        
-
+            return f"获取进程信息时出错: {e}"
+    
+    # @staticmethod 
+    # def get_process_command(pid):
+    #     try:
+    #         # 根据 PID 获取进程对象
+    #         process = psutil.Process(pid)
+    #         # 获取进程的命令行指令
+    #         cmdline = process.cmdline()
+    #         if cmdline:
+    #             return ' '.join(cmdline)
+    #         else:
+    #             return "无法获取命令行信息（可能是权限问题或进程已结束）"
+    #     except psutil.NoSuchProcess:
+    #         return f"进程 {pid} 不存在"
+    #     except psutil.AccessDenied:
+    #         return f"无法访问进程 {pid} 的信息（权限不足）"
+    #     except Exception as e:
+    #         return f"获取进程信息时出错: {e}"    
+    
     def send_gpu_info(self):
         """ Send GPU information to the server """
         url = f"http://{self.server_ip}/gpu_info"

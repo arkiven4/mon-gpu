@@ -1,4 +1,5 @@
 <table>
+    {% if processes %}
     <tr>
         {% for keys in processes[0].keys() %}
         <th>{{ keys }}</th>
@@ -11,4 +12,10 @@
         {% endfor %}
     </tr>
     {% endfor %}
+
+    {% else %}
+    <tr>
+        <td colspan="100%">No processes found.</td>
+    </tr>
+    {% endif %}
 </table>
