@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, render_template_string, render_templa
 import argparse
 from server_utils import generate_ssh_config, ssh_config_to_string
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 data_from_servers = dict()  # Store GPU data in memory
 
 @app.route('/gpu_info', methods=['POST'])
@@ -40,6 +40,8 @@ def receive_gpu_info():
     for gpu_info in gpu_data[1:]:
         if gpu_info['name'].startswith('b\''):
             gpu_info['name'] = gpu_info['name'][2:-1]
+        if (not gpu_info['fan_speed'].endswith('%')) and (len(gpu_info['fan_speed']) == 2):
+            gpu_info['fan_speed'] = f"{gpu_info['fan_speed']}%"
         data_from_servers[sid]['gpus'].append(gpu_info)
 
     return jsonify({"status": "success"}), 200

@@ -3,56 +3,34 @@
 
 <head>
     <title>GPU Monitor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background: #eee;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <meta charset="UTF-8">
+    <lang="en">
 </head>
 
 <body>
-    <h2>GPU Monitor</h2>
+    <h2 style="text-align: center;">GPU Monitor</h2>
     {% if data %}
-    <p>Get SSH Config -->
-        <a href='/ssh_config?proxy=false&username=your_username'>No Proxy</a>
-        <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
-    </p>
+    <br>
     {% for server, info in data.items() %}
-    <h3 style="margin-bottom: 0px; color: antiquewhite;">
-        <span style="color: #9FB3DF;">{{ info['hostname'] }}</span>
-        |
-        <span class="copyText" style="color:#9FB3DF;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>
-        |
-        <span style="color: #9FB3DF;">{{ info['driver_version'] }}</span>
-        |
-        <span style="color:#FFD66B;">{{ info['remark'] }}</span>
-        {% if info['remark2'] %}
-        <span style="color: #FF6363;">{{ info['remark2'] }}</span>
-        {% else %}
-        <span style="color: #80D8C3;">Alive</span>
-        {% endif %}
-
-        <span style="float:right; color: #533B4D;">{{ info['update_time'] }}</span>
-    </h3>
-
+    <div class="table-container">
     <table>
+        <caption>
+            <span style="color: #9FB3DF;">{{ info['hostname'] }}</span>
+            |
+            <span class="copyText" style="color:#9FB3DF;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>
+            |
+            <span style="color: #9FB3DF;">{{ info['driver_version'] }}</span>
+            |
+            <span style="color:#FFD66B;">{{ info['remark'] }}</span>
+            {% if info['remark2'] %}
+            <span style="color: #FF6363;">{{ info['remark2'] }}</span>
+            {% else %}
+            <span style="color: #80D8C3;">Alive</span>
+            {% endif %}
+
+            <span style="float:right; color: #533B4D;">{{ info['update_time'] }}</span>
+        </caption>
         <tr>
             {% if info['gpus'] and info['gpus'][0] %}
             {% for key in info['gpus'][0].keys() %}
@@ -69,7 +47,13 @@
         {% endfor %}
 
     </table>
+    </div>
     {% endfor %}
+    <hr>
+    <p>Get SSH Config -->
+        <a href='/ssh_config?proxy=false&username=your_username'>No Proxy</a>
+        <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
+    </p>
     {% else %}
     <p>No GPU data available.</p>
     {% endif %}

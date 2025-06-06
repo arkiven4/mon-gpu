@@ -1,0 +1,159 @@
+/* 全局样式和字体设置 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5; /* 页面背景色 */
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box; /* 确保 padding 不会增加元素总宽度 */
+}
+
+/* 表格容器：用于溢出滚动，在小屏幕上保持响应性 */
+.table-container {
+    width: 100%;
+    /* max-width: 900px; 最大宽度，避免表格过宽 */
+    overflow-x: auto; /* 当表格内容超出容器宽度时，允许水平滚动 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* 容器阴影，增加立体感 */
+    border-radius: 12px; /* 容器圆角 */
+
+    margin: 0 auto; /* 居中容器 */
+    margin-bottom: 1rem; /* 底部间距 */
+}
+
+/* 表格基本样式 */
+table {
+    width: 100%;
+    border-collapse: collapse; /* 移除单元格间距 */
+    border-spacing: 0;
+    background-color: #ffffff; /* 表格背景色 */
+    color: #333; /* 文本颜色 */
+    font-size: 0.95em;
+    border-radius: 12px; /* 表格整体圆角 */
+    overflow: hidden; /* 关键：确保内部内容也被圆角裁剪 */
+}
+
+/* 表格标题 */
+caption {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #333;
+    padding: 15px 0;
+    margin-bottom: 0px;
+    text-align: left;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    line-height: 0.5;
+}
+
+/* 表头样式 */
+thead th {
+    background-color: #5b9edb; /* 扁平化风格的蓝色背景 */
+    color: white; /* 白色文字 */
+    padding: 15px 20px;
+    text-align: left; /* 文字左对齐 */
+    font-weight: 600; /* 略粗的字体 */
+    text-transform: uppercase; /* 文本大写 */
+    letter-spacing: 0.05em; /* 字间距 */
+    font-size: 0.9em;
+}
+
+/* 单元格（数据单元格和表头单元格）的通用样式 */
+td, th {
+    padding: 6px 20px;
+    border-bottom: 1px solid #e0e0e0; /* 单元格底部浅灰色边框 */
+    text-align: center;
+}
+
+/* 第二列为显卡名，固定宽度以防止应其长短不同造成表格排列不齐 */
+th:nth-child(2) {
+    width: 15rem;
+}
+
+/* 最后一行没有底边框，让表格底部看起来更干净 */
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 斑马条纹效果 (奇偶行不同背景色) */
+tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f8f8f8; /* 浅灰色背景 */
+}
+
+/* 行悬停效果 */
+tbody tr:hover {
+    background-color: #e6f7ff; /* 悬停时浅蓝色背景 */
+    transition: background-color 0.3s ease; /* 过渡动画 */
+    cursor: pointer; /* 鼠标指针变为手形 */
+}
+
+/* 状态标签样式 */
+.status-active, .status-inactive, .status-pending {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white;
+}
+
+.status-active {
+    background-color: #28a745; /* 绿色 */
+}
+
+.status-inactive {
+    background-color: #dc3545; /* 红色 */
+}
+
+.status-pending {
+    background-color: #ffc107; /* 黄色 */
+    color: #333; /* 黄色背景下文字颜色可能需要调整 */
+}
+
+/* 操作按钮样式 */
+.action-btn {
+    background-color: #007bff; /* 蓝色按钮 */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.action-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px); /* 轻微上浮效果 */
+}
+
+.action-btn:active {
+    background-color: #004085;
+    transform: translateY(0); /* 按下时恢复原位 */
+}
+
+/* 针对小屏幕的简单响应式 */
+@media screen and (max-width: 600px) {
+    table {
+        /* 在小屏幕上可能需要一些微调，比如调整字体大小 */
+        font-size: 0.85em;
+    }
+
+    thead th {
+        padding: 10px 15px;
+    }
+
+    td {
+        padding: 8px 15px;
+    }
+
+    /* 更好的响应式通常需要更复杂的 flex/grid 或 data-attributes */
+    /* 这里仅仅是为了演示表格样式，不深入响应式布局 */
+}
