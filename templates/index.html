@@ -35,15 +35,21 @@
         <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
     </p>
     {% for server, info in data.items() %}
-    <h3 style="margin-bottom: 0px;">
-        {{ info['hostname'] }}
-        (<span class="copyText" style="color:blue;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>, {{
-        info['driver_version'] }})
-        @{{ info['update_time'] }}
-        <span style="color:orange;">{{ info['remark'] }}</span>
+    <h3 style="margin-bottom: 0px; color: antiquewhite;">
+        <span style="color: #9FB3DF;">{{ info['hostname'] }}</span>
+        |
+        <span class="copyText" style="color:#9FB3DF;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>
+        |
+        <span style="color: #9FB3DF;">{{ info['driver_version'] }}</span>
+        |
+        <span style="color:#FFD66B;">{{ info['remark'] }}</span>
         {% if info['remark2'] %}
-        <span style="color: red;">{{ info['remark2'] }}</span>
+        <span style="color: #FF6363;">{{ info['remark2'] }}</span>
+        {% else %}
+        <span style="color: #80D8C3;">Alive</span>
         {% endif %}
+
+        <span style="float:right; color: #533B4D;">{{ info['update_time'] }}</span>
     </h3>
 
     <table>
