@@ -40,7 +40,7 @@ class GPUMonitor:
             gpu_name = pynvml.nvmlDeviceGetName(handle)
             gpu_temperature = str(pynvml.nvmlDeviceGetTemperature(handle, 0))
             try:
-                gpu_fan_speed = str(pynvml.nvmlDeviceGetFanSpeed(handle))
+                gpu_fan_speed = str(pynvml.nvmlDeviceGetFanSpeed(handle))+'%'
             except pynvml.NVMLError as e:
                 gpu_fan_speed = "Not Supported"
             gpu_power_state = str(pynvml.nvmlDeviceGetPowerState(handle))
@@ -68,7 +68,7 @@ class GPUMonitor:
             self.gpu_info[i]['name'] = f"{gpu_name}"
             self.gpu_info[i]['memory_usage'] = f"{used_memory}/{total_memory}{self.SUFFIX}"
             self.gpu_info[i]['temperature'] = f"{gpu_temperature}°C"
-            self.gpu_info[i]['fan_speed'] = f"{gpu_fan_speed}%"
+            self.gpu_info[i]['fan_speed'] = f"{gpu_fan_speed}"
             self.gpu_info[i]['power_state'] = f"{gpu_power_state}"
             self.gpu_info[i]['gpu_utilization'] = f"{gpu_util_rate}%"
             self.gpu_info[i]['memory_utilization'] = f"{gpu_memory_rate}%"
