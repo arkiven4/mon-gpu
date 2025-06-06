@@ -1,0 +1,42 @@
+/* 作者信息 Div 的 CSS 样式 */
+.author-info-footer {
+    /* 布局和定位 */
+    width: 100%; /* 占据父容器的全部宽度 */
+    padding: 25px 0; /* 上下内边距，左右无内边距让内容居中 */
+    box-sizing: border-box; /* 确保 padding 不会增加元素总宽度 */
+    
+    /* 颜色和背景 */
+    background-color: #ffffff00; /* 扁平化风格的深色背景 */
+    color: #212323; /* 文本颜色，与背景形成良好对比 */
+    
+    /* 字体和排版 */
+    text-align: center; /* 使内部文本水平居中 */
+    font-size: 0.9em; /* 字体略小 */
+    line-height: 1.6; /* 行高，提高可读性 */
+    
+    /* 视觉效果 */
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* 顶部细微边框，与内容区域分隔 */
+    /* 没有border-radius，因为通常底部div是全宽的，不需要圆角 */
+    
+    /* 弹性盒子布局 (用于“粘性”底部，如果内容不足以撑开页面) */
+    /* 如果你在body上使用了 display: flex; flex-direction: column;，这个 div 就可以直接作为 flex-item 自动粘在底部 */
+    /* margin-top: auto; 如果你想让它总是位于父容器的底部，且父容器也是 flex column */
+}
+
+/* 作者信息 div 内部的段落样式 */
+.author-info-footer p {
+    margin: 0; /* 移除段落默认的外边距 */
+    padding: 5px 0; /* 为每个段落增加一点垂直间距 */
+}
+
+/* 作者信息 div 内部的链接样式 */
+.author-info-footer a {
+    color: #a2d2ff; /* 链接颜色，与背景形成对比 */
+    text-decoration: none; /* 移除下划线 */
+    transition: color 0.3s ease; /* 鼠标悬停时颜色过渡效果 */
+}
+
+.author-info-footer a:hover {
+    color: #f7f7f7; /* 鼠标悬停时颜色变浅 */
+    text-decoration: underline; /* 鼠标悬停时显示下划线 */
+}

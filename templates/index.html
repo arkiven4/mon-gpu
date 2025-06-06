@@ -4,6 +4,7 @@
 <head>
     <title>GPU Monitor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='author.css') }}">
     <meta charset="UTF-8">
     <lang="en">
 </head>
@@ -57,6 +58,10 @@
     {% else %}
     <p>No GPU data available.</p>
     {% endif %}
+
+    <div class="author-info-footer">
+        <p>&copy; 2025 HAI / Hongwei Hu. All rights reserved.</p>
+    </div>
 
     <script>
         setInterval(function () {
