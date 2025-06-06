@@ -39,7 +39,8 @@ table {
 caption {
     font-size: 1.4em;
     font-weight: bold;
-    color: #333;
+    /* color: #333; */
+    color: #9FB3DF; /* 扁平化风格的蓝色 */
     padding: 15px 0;
     margin-bottom: 0px;
     text-align: left;
