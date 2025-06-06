@@ -1,0 +1,44 @@
+.title-card {
+    /* 容器布局 */
+    width: 100%; /* 占据父容器的全部宽度 */
+    max-width: 600px; /* 设置最大宽度，防止标题过长 */
+    margin: 40px auto 30px auto; /* 上下外边距，左右自动居中 */
+    padding: 30px 20px; /* 内部填充，让内容不贴边 */
+    box-sizing: border-box; /* 确保 padding 不会增加元素总宽度 */
+    
+    /* 视觉风格 */
+    background-color: #ffffff; /* 白色背景，与表格和页面主色调一致 */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* 柔和的阴影，增加立体感 */
+    border-radius: 15px; /* 更明显的圆角 */
+    
+    /* 动画效果（可选，增加一些精致感） */
+    opacity: 0; /* 初始不可见 */
+    transform: translateY(20px); /* 初始位置略低于最终位置 */
+    animation: fadeInSlideUp 0.8s ease-out forwards; /* 动画效果 */
+}
+
+/* 标题文本本身的样式 */
+.title-card h1 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 3.2em; /* 标题字体大小，可以根据需要调整 */
+    font-weight: 700; /* 加粗 */
+    color: #333; /* 深色文本，与背景形成对比 */
+    text-align: center; /* 文本居中 */
+    margin: 0; /* 移除 h1 默认的外边距，由父容器的 padding 控制间距 */
+    line-height: 1.2; /* 行高 */
+    letter-spacing: -0.02em; /* 微调字间距，让标题更紧凑 */
+    /* 可以在这里给标题文字加一点点 subtle 的 text-shadow */
+    /* text-shadow: 1px 1px 2px rgba(0,0,0,0.05); */
+}
+
+/* 动画定义 */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -46,12 +46,13 @@ def receive_gpu_info():
 
     return jsonify({"status": "success"}), 200
 
-@app.route('/raw_data', methods=['GET'])
+@app.route('/api/raw_data', methods=['GET'])
 def index():
     """
     Display the GPU information received from clients.
     """
-    return jsonify(data_from_servers)
+    data_sorted = {k: v for k, v in sorted(data_from_servers.items(), key=lambda item: item[1]['hostname'])}
+    return jsonify(data_sorted)
 
 @app.route('/', methods=['GET'])
 def visual():
@@ -61,6 +62,14 @@ def visual():
     # Sort the data by hostname
     data_sorted = {k: v for k, v in sorted(data_from_servers.items(), key=lambda item: item[1]['hostname'])}
     return render_template('index.html', data=data_sorted)
+
+# @app.route('/new', methods=['GET'])
+# def index_new():
+#     """
+#     Render a new HTML page to visualize GPU information.
+#     """
+#     # Sort the data by hostname
+#     return render_template('index_new.html')
 
 @app.route('/ssh_config', methods=['GET'])
 def ssh_config():

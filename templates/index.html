@@ -5,17 +5,21 @@
     <title>GPU Monitor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='author.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='title.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='other.css') }}">
     <meta charset="UTF-8">
     <lang="en">
 </head>
 
 <body>
-    <h2 style="text-align: center;">GPU Monitor</h2>
+    <div class="title-card" >
+        <h1>Hi, HAI Dashboard</h1>
+    </div>
     {% if data %}
     <br>
     {% for server, info in data.items() %}
     <div class="table-container">
-    <table>
+    <table id="{{ server}}">
         <caption>
             <span style="color: #5b9edb;">{{ info['hostname'] }}</span>
             |
