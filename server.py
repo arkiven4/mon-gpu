@@ -1,9 +1,18 @@
 from flask import Flask, jsonify, request, render_template_string, render_template
 import argparse
+import json
+import os
 from server_utils import generate_ssh_config, ssh_config_to_string
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 data_from_servers = dict()  # Store GPU data in memory
+
+# Load existing data from pickle file if it exists
+pickle_file = 'data_from_servers.json'
+if os.path.exists(pickle_file):
+    with open(pickle_file, 'rb') as f:
+        data_from_servers = json.load(f)
+        print(f"Loaded existing data from {pickle_file}")
 
 @app.route('/device_info', methods=['POST'])
 def receive_gpu_info():
@@ -56,14 +65,6 @@ def visual():
     data_sorted = {k: v for k, v in sorted(data_from_servers.items(), key=lambda item: item[1]['hostname'])}
     return render_template('index.html', data=data_sorted)
 
-# @app.route('/new', methods=['GET'])
-# def index_new():
-#     """
-#     Render a new HTML page to visualize GPU information.
-#     """
-#     # Sort the data by hostname
-#     return render_template('index_new.html')
-
 @app.route('/ssh_config', methods=['GET'])
 def ssh_config():
     """
@@ -107,6 +108,11 @@ def search_offline_servers():
         offline_servers_id = [k for k, v in data_from_servers.items() if current_time - datetime.strptime(v.get('last_report', 0),"%Y-%m-%d %H:%M:%S").timestamp() >= 120]
         for server_id in offline_servers_id:
             data_from_servers[server_id]['remark2'] = 'OFFLINE'
+            
+        # save the updated data
+        json_file = 'data_from_servers.json'
+        with open(json_file, 'w') as f:
+            json.dump(data_from_servers, f, indent=4)
         threading.Event().wait(30)  # Wait for 30s before checking again
 
 
