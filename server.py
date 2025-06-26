@@ -107,7 +107,7 @@ def search_offline_servers():
         offline_servers_id = [k for k, v in data_from_servers.items() if current_time - datetime.strptime(v.get('last_report', 0),"%Y-%m-%d %H:%M:%S").timestamp() >= 120]
         for server_id in offline_servers_id:
             data_from_servers[server_id]['remark2'] = 'OFFLINE'
-        threading.Event().wait(60)  # Wait for 30s before checking again
+        threading.Event().wait(30)  # Wait for 30s before checking again
 
 
 if __name__ == '__main__':
