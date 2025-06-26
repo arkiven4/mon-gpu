@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>GPU Monitor</title>
+    <title>HAI Server Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='author.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='title.css') }}">
@@ -13,37 +13,41 @@
 
 <body>
     <div class="title-card" >
-        <h1>Hi, HAI Dashboard</h1>
+        <h1>HAI Server Dashboard</h1>
     </div>
     {% if data %}
     <br>
-    {% for server, info in data.items() %}
+    {% for server_id, device_info in data.items() %}
     <div class="table-container">
-    <table id="{{ server}}">
+    <table id="{{ server_id }}">
         <caption>
-            <span style="color: #5b9edb;">{{ info['hostname'] }}</span>
+            <span style="color: #5b9edb;">{{ device_info['hostname'] }}</span>
             |
-            <span class="copyText" style="color:#5b9edb;user-select: all; cursor: pointer;">{{ info['ip'] }}</span>
+            <span class="copyText" style="color:#5b9edb;user-select: all; cursor: pointer;">{{ device_info['ip'] }}</span>
             |
-            <span style="color: #5b66db;">{{ info['driver_version'] }}</span>
+            <span style="color: #5b66db;">{{ device_info['system']['driver_version'] }}</span>
+            |            
+            <span style="color: #8A2BE2;">{{ device_info['system']['cpu']['name'] }} x{{ device_info['system']['cpu']['threads'] }} @{{ device_info['system']['cpu']['frequency'] }}</span>
             |
-            <span style="color:#FFD66B;">{{ info['remark'] }}</span>
-            {% if info['remark2'] %}
-            <span style="color: #FF6363;">{{ info['remark2'] }}</span>
+            <span style="color: #aa5bdb;">{{ device_info['system']['ram']['available'] }}/{{ device_info['system']['ram']['total'] }}{{ device_info['system']['ram']['unit'] }} RAM Available</span>            
+            |
+            <span style="color:#FFD66B;">{{ device_info['remark'] }}</span>
+            {% if device_info['remark2'] %}
+            <span style="color: #FF6363;">{{ device_info['remark2'] }}</span>
             {% else %}
             <span style="color: #80D8C3;">Alive</span>
             {% endif %}
 
-            <span style="float:right; color: #533B4D;">{{ info['update_time'] }}</span>
+            <span style="float:right; color: #533B4D;">{{ device_info['last_report'] }}</span>
         </caption>
         <tr>
-            {% if info['gpus'] and info['gpus'][0] %}
-            {% for key in info['gpus'][0].keys() %}
+            {% if device_info['gpu'] and device_info['gpu'][0] %}
+            {% for key in device_info['gpu'][0].keys() %}
             <th>{{ key }}</th>
             {% endfor %}
             {% endif %}
         </tr>
-        {% for gpu in info['gpus'] %}
+        {% for gpu in device_info['gpu'] %}
         <tr>
             {% for value in gpu.values() %}
             <td>{{ value }}</td>
@@ -55,16 +59,18 @@
     </div>
     {% endfor %}
     <hr>
-    <p>Get SSH Config -->
+    <p>
+        ↓Get SSH Config↓
+        <br>
         <a href='/ssh_config?proxy=false&username=your_username'>No Proxy</a>
         <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
     </p>
     {% else %}
-    <p>No GPU data available.</p>
+    <p>No data available.</p>
     {% endif %}
-
+    <hr>
     <div class="author-info-footer">
-        <p>&copy; 2025 HAI / Hongwei Hu. All rights reserved.</p>
+        <p>&copy; 2025 HAI / Hiroi. All rights reserved.</p>
     </div>
 
     <script>
