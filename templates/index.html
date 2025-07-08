@@ -3,12 +3,15 @@
 
 <head>
     <title>HAI Server Dashboard</title>
+    <meta charset="UTF-8">
+    <lang="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='author.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='title.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='other.css') }}">
-    <meta charset="UTF-8">
-    <lang="en">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -21,15 +24,17 @@
     <div class="table-container">
     <table id="{{ server_id }}">
         <caption>
-            <span style="color: #5b9edb;">{{ device_info['hostname'] }}</span>
+            <div class="inline-column">
+                <span style="color: #5b9edb;">{{ device_info['hostname'] }}</span>
+                <span class="copyText" style="color:#5b9edb;user-select: all; cursor: pointer;">{{ device_info['ip'] }}</span>
+            </div>
             |
-            <span class="copyText" style="color:#5b9edb;user-select: all; cursor: pointer;">{{ device_info['ip'] }}</span>
+            <div class="inline-column">
+                <span style="color: #8A2BE2;">{{ device_info['system']['cpu']['name'] }} x{{ device_info['system']['cpu']['threads'] }} @{{ device_info['system']['cpu']['frequency'] }}</span>
+                <span style="color: #aa5bdb;">{{ device_info['system']['ram']['available'] }}/{{ device_info['system']['ram']['total'] }}{{ device_info['system']['ram']['unit'] }} RAM Available</span>
+            </div>
             |
             <span style="color: #5b66db;">{{ device_info['system']['driver_version'] }}</span>
-            |            
-            <span style="color: #8A2BE2;">{{ device_info['system']['cpu']['name'] }} x{{ device_info['system']['cpu']['threads'] }} @{{ device_info['system']['cpu']['frequency'] }}</span>
-            |
-            <span style="color: #aa5bdb;">{{ device_info['system']['ram']['available'] }}/{{ device_info['system']['ram']['total'] }}{{ device_info['system']['ram']['unit'] }} RAM Available</span>            
             |
             <span style="color:#FFD66B;">{{ device_info['remark'] }}</span>
             {% if device_info['remark2'] %}

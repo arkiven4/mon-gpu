@@ -11,15 +11,20 @@ def generate_ssh_config(servers: dict, username: str, useNaistProxy: bool):
     """
     ssh_config = []
     for server in servers.values():
-        if useNaistProxy:
-            ssh_config.append(f"Host {server['hostname']}\n"
-                              f"  HostName {server['ip']}\n"
-                              f"  User {username}\n"
-                              f"  ProxyCommand ssh -W %h:%p sh.naist.jp\n")
-        else:
-            ssh_config.append(f"Host {server['hostname']}\n"
-                              f"  HostName {server['ip']}\n"
-                              f"  User {username}\n")
+        # print(f"{server}")
+        try:
+            if useNaistProxy:
+                ssh_config.append(f"Host {server['hostname']}\n"
+                                f"  HostName {server['ip']}\n"
+                                f"  User {username}\n"
+                                f"  ProxyCommand ssh -W %h:%p sh.naist.jp\n")
+            else:
+                ssh_config.append(f"Host {server['hostname']}\n"
+                                f"  HostName {server['ip']}\n"
+                                f"  User {username}\n")
+        except KeyError as e:
+            print(f"KeyError: {e} in server {server}")
+            continue
     if useNaistProxy:
         ssh_config.append("Host sh.naist.jp\n"
                           "  HostName sh.naist.jp\n"
