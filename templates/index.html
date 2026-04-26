@@ -1,97 +1,293 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en" data-bs-theme="light" data-theme="light">
 <head>
-    <title>HAI Server Dashboard</title>
     <meta charset="UTF-8">
-    <lang="en">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorium PCs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='author.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='title.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='other.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <div class="title-card" >
-        <h1>HAI Server Dashboard</h1>
+<div class="container-fluid px-4 py-4">
+
+    <!-- Page header -->
+    <div class="page-header">
+        <div>
+            <p class="page-title">Laboratorium PCs</p>
+            <p class="page-sub">Server Status Dashboard</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <p class="refresh-text mb-0">Refreshes in <span id="countdown">30</span>s</p>
+            <button class="theme-btn" id="themeToggle">
+                <!-- Sun: shown in dark mode -->
+                <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+                <!-- Moon: shown in light mode -->
+                <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                </svg>
+                <span class="icon-sun">Day</span>
+                <span class="icon-moon">Night</span>
+            </button>
+        </div>
     </div>
+
     {% if data %}
-    <br>
-    {% for server_id, device_info in data.items() %}
-    <div class="table-container">
-    <table id="{{ server_id }}">
-        <caption>
-            <div class="inline-column">
-                <span style="color: #5b9edb;">{{ device_info['hostname'] }}</span>
-                <span class="copyText" style="color:#5b9edb;user-select: all; cursor: pointer;">{{ device_info['ip'] }}</span>
+    {% for server_id, d in data.items() %}
+
+    {% set ram_total  = d['system']['ram']['total'] | float %}
+    {% set ram_avail  = d['system']['ram']['available'] | float %}
+    {% set ram_used   = (ram_total - ram_avail) | round(1) %}
+    {% set ram_pct    = ((ram_total - ram_avail) / ram_total * 100) | round | int if ram_total > 0 else 0 %}
+    {% set is_offline = d.get('remark2', '') == 'OFFLINE' %}
+    {% set card_cls   = 'is-offline' if is_offline else '' %}
+    {% set dot_cls    = 'offline' if is_offline else 'online' %}
+    {% set ram_cls    = 'cbar-danger' if ram_pct >= 80 else ('cbar-warn' if ram_pct >= 50 else 'cbar-ram') %}
+    {% set gpu_count  = d['gpu'] | length %}
+    {% set gpu_col    = 'col-12' if gpu_count == 1 else ('col-12 col-md-6' if gpu_count == 2 else 'col-12 col-md-6 col-xl-4') %}
+
+    <div class="server-card {{ card_cls }} mb-4">
+
+        <!-- Header -->
+        <div class="server-card-header">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="status-dot {{ dot_cls }}"></span>
+                <span class="hostname">{{ d['hostname'] }}</span>
+                {% if d.get('remark') %}<span class="badge badge-remark">{{ d['remark'] }}</span>{% endif %}
+                {% if is_offline %}<span class="badge bg-danger bg-opacity-75">OFFLINE</span>
+                {% elif d.get('remark2') %}<span class="badge bg-secondary">{{ d['remark2'] }}</span>{% endif %}
             </div>
-            |
-            <div class="inline-column">
-                <span style="color: #8A2BE2;">{{ device_info['system']['cpu']['name'] }} x{{ device_info['system']['cpu']['threads'] }} @{{ device_info['system']['cpu']['frequency'] }}</span>
-                <span style="color: #aa5bdb;">{{ device_info['system']['ram']['available'] }}/{{ device_info['system']['ram']['total'] }}{{ device_info['system']['ram']['unit'] }} RAM Available</span>
+            <span class="ts-text">{{ d['last_report'] }}</span>
+        </div>
+
+        <div class="server-card-body">
+
+            <!-- ① Computer info card -->
+            <div class="info-card mb-4">
+                <div class="row g-0">
+
+                    <div class="col-12 col-md-4 info-col">
+                        <div class="info-item">
+                            <div class="info-icon-wrap">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="6" y="6" width="12" height="12" rx="2"/>
+                                    <path d="M9 6V3M12 6V3M15 6V3M9 18v3M12 18v3M15 18v3M6 9H3M6 12H3M6 15H3M18 9h3M18 12h3M18 15h3"/>
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <span class="info-label">CPU</span>
+                                <span class="info-value">{{ d['system']['cpu']['name'] }}</span>
+                                <span class="info-sub">{{ d['system']['cpu']['threads'] }}T · {{ d['system']['cpu']['frequency'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 info-col">
+                        <div class="info-item">
+                            <div class="info-icon-wrap">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                    <path d="M8 21h8M12 17v4"/>
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <span class="info-label">OS</span>
+                                <span class="info-value">{{ d['system'].get('os', 'N/A') }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 info-col">
+                        <div class="info-item">
+                            <div class="info-icon-wrap">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="8" width="22" height="8" rx="2"/>
+                                    <path d="M7 8V5M10 8V5M13 8V5M16 8V5M1 12h22"/>
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <span class="info-label">RAM</span>
+                                <span class="info-value">{{ ram_total }} GB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if d['system'].get('driver_version') %}
+                    <div class="col-12 col-md-4 info-col">
+                        <div class="info-item">
+                            <div class="info-icon-wrap">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <span class="info-label">Driver</span>
+                                <span class="info-value">{{ d['system']['driver_version'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-12 col-md-4 info-col">
+                        <div class="info-item copyable" data-copy="{{ d['ip'] }}" title="Click to copy">
+                            <div class="info-icon-wrap">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="2"/>
+                                    <path d="M16.24 7.76a6 6 0 010 8.49M7.76 16.24a6 6 0 010-8.49"/>
+                                    <path d="M19.07 4.93a10 10 0 010 14.14M4.93 19.07a10 10 0 010-14.14"/>
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <span class="info-label">IP</span>
+                                <span class="info-value">{{ d['ip'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /info columns -->
+
+                <!-- Usage bars -->
+                <div class="info-usage">
+                    <div class="row g-3">
+                        {% if d['system'].get('cpu_usage') is not none %}
+                        {% set cpu_pct = d['system']['cpu_usage'] | round | int %}
+                        {% set cpu_cls = 'cbar-danger' if cpu_pct >= 80 else ('cbar-warn' if cpu_pct >= 50 else 'cbar-cpu') %}
+                        <div class="col-12 col-md-6">
+                            <div class="usage-row">
+                                <span class="usage-lbl">CPU Usage</span>
+                                <span class="usage-val">{{ cpu_pct }}%</span>
+                            </div>
+                            <div class="cbar"><div class="cbar-fill {{ cpu_cls }}" data-width="{{ cpu_pct }}"></div></div>
+                        </div>
+                        {% endif %}
+                        <div class="col-12 col-md-6">
+                            <div class="usage-row">
+                                <span class="usage-lbl">RAM Usage</span>
+                                <span class="usage-val">{{ ram_used }} / {{ ram_total }} GB</span>
+                            </div>
+                            <div class="cbar"><div class="cbar-fill {{ ram_cls }}" data-width="{{ ram_pct }}"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /info-card -->
+
+            <!-- ② GPU section -->
+            {% if d['gpu'] %}
+            <div class="sec-divider mb-3">
+                <span class="sec-label">GPUs · {{ gpu_count }}</span>
             </div>
-            |
-            <span style="color: #5b66db;">{{ device_info['system']['driver_version'] }}</span>
-            |
-            <span style="color:#FFD66B;">{{ device_info['remark'] }}</span>
-            {% if device_info['remark2'] %}
-            <span style="color: #FF6363;">{{ device_info['remark2'] }}</span>
-            {% else %}
-            <span style="color: #80D8C3;">Alive</span>
+            <div class="row g-3">
+            {% for gpu in d['gpu'] %}
+            {% set vram_pct = (gpu['memory_used'] / gpu['memory_total'] * 100) | round | int if gpu['memory_total'] > 0 else 0 %}
+            {% set gpu_pct  = gpu['gpu_utilization'][:-1] | int %}
+            {% set fan_str  = gpu['fan_speed'] %}
+            {% set fan_pct  = fan_str[:-1] | int if fan_str != 'N/A' else 0 %}
+            {% set vram_cls = 'cbar-danger' if vram_pct >= 80 else ('cbar-warn' if vram_pct >= 50 else 'cbar-vram') %}
+            {% set gpuu_cls = 'cbar-danger' if gpu_pct  >= 80 else ('cbar-warn' if gpu_pct  >= 50 else 'cbar-gpu') %}
+            {% set fan_cls  = 'cbar-danger' if fan_pct  >= 80 else ('cbar-warn' if fan_pct  >= 50 else 'cbar-fan') %}
+            <div class="{{ gpu_col }}">
+                <div class="gpu-card">
+                    <div class="gpu-card-hdr">
+                        <span class="gpu-idx">#{{ gpu['index'] }}</span>
+                        <span class="gpu-name" title="{{ gpu['name'] }}">{{ gpu['name'] }}</span>
+                        <span class="gpu-temp">{{ gpu['temperature'] }}</span>
+                    </div>
+                    <div class="gpu-card-body">
+                        <div class="row g-2">
+                            <div class="{{ 'col-4' if fan_str != 'N/A' else 'col-6' }}">
+                                <div class="bar-row">
+                                    <span class="bar-lbl">VRAM</span>
+                                    <span class="bar-val">{{ gpu['memory_used'] }}/{{ gpu['memory_total'] }}G</span>
+                                </div>
+                                <div class="cbar"><div class="cbar-fill {{ vram_cls }}" data-width="{{ vram_pct }}"></div></div>
+                            </div>
+                            <div class="{{ 'col-4' if fan_str != 'N/A' else 'col-6' }}">
+                                <div class="bar-row">
+                                    <span class="bar-lbl">GPU</span>
+                                    <span class="bar-val">{{ gpu_pct }}%</span>
+                                </div>
+                                <div class="cbar"><div class="cbar-fill {{ gpuu_cls }}" data-width="{{ gpu_pct }}"></div></div>
+                            </div>
+                            {% if fan_str != 'N/A' %}
+                            <div class="col-4">
+                                <div class="bar-row">
+                                    <span class="bar-lbl">Fan</span>
+                                    <span class="bar-val">{{ fan_pct }}%</span>
+                                </div>
+                                <div class="cbar"><div class="cbar-fill {{ fan_cls }}" data-width="{{ fan_pct }}"></div></div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            </div><!-- /gpu row -->
             {% endif %}
 
-            <span style="float:right; color: #533B4D;">{{ device_info['last_report'] }}</span>
-        </caption>
-        <tr>
-            {% if device_info['gpu'] and device_info['gpu'][0] %}
-            {% for key in device_info['gpu'][0].keys() %}
-            <th>{{ key }}</th>
-            {% endfor %}
-            {% endif %}
-        </tr>
-        {% for gpu in device_info['gpu'] %}
-        <tr>
-            {% for value in gpu.values() %}
-            <td>{{ value }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-
-    </table>
-    </div>
+        </div><!-- /server-card-body -->
+    </div><!-- /server-card -->
     {% endfor %}
-    <hr>
-    <p>
-        ↓Get SSH Config↓
-        <br>
-        <a href='/ssh_config?proxy=false&username=your_username'>No Proxy</a>
-        <a href='/ssh_config?proxy=true&username=your_username'>Proxied</a>
-    </p>
-    {% else %}
-    <p>No data available.</p>
-    {% endif %}
-    <hr>
-    <div class="author-info-footer">
-        <p>&copy; 2025 HAI / Hiroi. All rights reserved.</p>
+
+    <div class="page-footer">
+        SSH Config: &nbsp;
+        <a href="/ssh_config?proxy=false&username=your_username">No Proxy</a> &nbsp;·&nbsp;
+        <a href="/ssh_config?proxy=true&username=your_username">Proxied</a>
     </div>
 
-    <script>
-        setInterval(function () {
-            window.location.reload();
-        }, 30000); // 60000 毫秒 = 60 秒
+    {% else %}
+    <div class="text-center py-5" style="color:var(--page-sub-clr)">No servers reporting yet.</div>
+    {% endif %}
 
-        const ips = document.querySelectorAll('.copyText');
-        ips.forEach(ip => {
-            ip.onclick = function () {
-                // need https
-                navigator.clipboard.writeText(this.innerText);
-            };
+</div>
+<script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+<script>
+    // Apply progress bar widths
+    document.querySelectorAll('.cbar-fill[data-width]').forEach(el => {
+        el.style.width = el.dataset.width + '%';
+    });
+
+    // Copy IP
+    document.querySelectorAll('.copyable[data-copy]').forEach(el => {
+        el.addEventListener('click', () => {
+            navigator.clipboard.writeText(el.dataset.copy);
+            const lbl = el.querySelector('.info-label');
+            if (!lbl) return;
+            const orig = lbl.textContent;
+            lbl.textContent = 'Copied!';
+            setTimeout(() => { lbl.textContent = orig; }, 1500);
         });
+    });
 
-    </script>
+    // Theme toggle
+    const html = document.documentElement;
+    const btn  = document.getElementById('themeToggle');
+
+    function applyTheme(dark) {
+        html.setAttribute('data-theme', dark ? 'dark' : 'light');
+        html.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        localStorage.setItem('gpumon-theme', dark ? 'dark' : 'light');
+    }
+
+    // Restore saved preference (default: light)
+    applyTheme(localStorage.getItem('gpumon-theme') === 'dark');
+
+    btn.addEventListener('click', () => {
+        applyTheme(html.getAttribute('data-theme') !== 'dark');
+    });
+
+    // Countdown refresh
+    let t = 30;
+    const cd = document.getElementById('countdown');
+    setInterval(() => {
+        t--;
+        if (t <= 0) window.location.reload();
+        if (cd) cd.textContent = t;
+    }, 1000);
+</script>
 </body>
-
 </html>

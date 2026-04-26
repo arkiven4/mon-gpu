@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cough Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='cough_detector.css') }}">
+</head>
+<body class="cd-body" data-theme="light">
+
+<!-- ── Mic Permission Overlay ── -->
+<div id="permOverlay" class="cd-overlay">
+    <div class="cd-perm-card">
+        <span class="cd-mic-icon">🎙️</span>
+        <h2>Cough Detector</h2>
+        <p>
+            This tool listens to your microphone and uses a machine-learning model
+            to detect coughs in real time.<br><br>
+            <strong>No audio is saved to disk.</strong> All recordings are kept
+            only in your browser session.
+        </p>
+        <button id="btnAllow" class="cd-btn" style="width:100%;padding:12px;">
+            Allow Microphone Access
+        </button>
+        <p id="permError" style="color:#ef4444;font-size:0.8rem;margin-top:12px;display:none;"></p>
+    </div>
+</div>
+
+<!-- ── Main App ── -->
+<div id="mainApp" class="cd-app d-none">
+
+    <!-- Header -->
+    <div class="cd-header">
+        <div>
+            <h1 class="cd-title">Cough Detector</h1>
+            <span class="cd-subtitle">Real-time ML · ONNX · SR {{ sample_rate }} Hz</span>
+        </div>
+        <div class="cd-header-controls">
+            <select id="deviceSelect" class="cd-select" title="Input device"></select>
+            <button id="btnTheme" class="cd-btn-icon" title="Toggle day / night" onclick="toggleTheme()">
+                <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41
+                             M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+                <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                </svg>
+            </button>
+            <button id="btnStartStop" class="cd-btn">Start</button>
+        </div>
+    </div>
+
+    <!-- Waveform -->
+    <div class="cd-card">
+        <div class="cd-card-label">Live Waveform</div>
+        <canvas id="waveCanvas"></canvas>
+    </div>
+
+    <!-- Status row -->
+    <div class="cd-status-row">
+
+        <!-- Probability -->
+        <div class="cd-card">
+            <div class="cd-card-label">Cough Probability</div>
+            <div class="cd-prob-track" id="probTrack">
+                <div class="cd-prob-bar" id="probBar"></div>
+            </div>
+            <div class="cd-prob-row">
+                <span id="probValue">0.0000</span>
+                <span class="cd-thresh-lbl">threshold: {{ '%.4f' | format(threshold) }}</span>
+            </div>
+        </div>
+
+        <!-- Indicator -->
+        <div class="cd-card">
+            <div class="cd-card-label">Status</div>
+            <div class="cd-indicator cd-ind-idle" id="indicator">
+                <div class="cd-dot" id="indDot"></div>
+                <span id="indText">IDLE</span>
+            </div>
+            <div class="cd-last-det" id="lastDet">—</div>
+        </div>
+
+    </div>
+
+    <!-- Cough Log -->
+    <div class="cd-card">
+        <div class="cd-card-hdr">
+            <div class="cd-card-label">Detected Coughs</div>
+            <span class="cd-badge" id="countBadge">0</span>
+            <div style="flex:1"></div>
+            <button class="cd-btn-xs" onclick="clearLog()">Clear</button>
+        </div>
+        <div class="cd-log" id="coughLog">
+            <div class="cd-empty">No coughs detected yet. Press <strong>Start</strong> to begin.</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const THRESHOLD = {{ threshold }};
+    const MODEL_SR  = {{ sample_rate }};
+</script>
+<script src="{{ url_for('static', filename='cough_detector.js') }}"></script>
+</body>
+</html>

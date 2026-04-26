@@ -1,0 +1,437 @@
+/* ── Light mode (default / day) ── */
+body.cd-body {
+    --cd-bg:           #f1f5f9;
+    --cd-card-bg:      rgba(255,255,255,0.92);
+    --cd-card-border:  rgba(0,0,0,0.07);
+    --cd-card-shadow:  0 1px 4px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --cd-text:         #1e293b;
+    --cd-dim:          rgba(71,85,105,0.72);
+    --cd-wave-bg:      #dce8f5;
+    --cd-grid-clr:     rgba(0,0,0,0.05);
+    --cd-center-clr:   rgba(0,0,0,0.08);
+    --cd-overlay-bg:   rgba(241,245,249,0.97);
+    --cd-select-bg:    rgba(255,255,255,0.95);
+    --cd-btnxs-bg:     rgba(0,0,0,0.04);
+    --cd-btnxs-hover:  rgba(0,0,0,0.09);
+    --cd-prob-track:   rgba(0,0,0,0.07);
+    --cd-thresh-mark:  rgba(0,0,0,0.22);
+    --cd-scroll-thumb: rgba(0,0,0,0.12);
+    --cd-dot-idle:     #94a3b8;
+    --cd-green:        #16a34a;
+    --cd-red:          #dc2626;
+    --cd-amber:        #d97706;
+    --cd-blue:         #2563eb;
+    --cd-purple:       #7c3aed;
+
+    background: var(--cd-bg);
+    color: var(--cd-text);
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    transition: background 0.25s, color 0.25s;
+}
+
+/* ── Dark mode (night) ── */
+body.cd-body[data-theme="dark"] {
+    --cd-bg:           #070b14;
+    --cd-card-bg:      rgba(13,20,38,0.92);
+    --cd-card-border:  rgba(255,255,255,0.07);
+    --cd-card-shadow:  none;
+    --cd-text:         #e2e8f0;
+    --cd-dim:          rgba(148,163,184,0.65);
+    --cd-wave-bg:      #070e1c;
+    --cd-grid-clr:     rgba(255,255,255,0.04);
+    --cd-center-clr:   rgba(255,255,255,0.06);
+    --cd-overlay-bg:   rgba(7,11,20,0.97);
+    --cd-select-bg:    rgba(13,20,38,0.9);
+    --cd-btnxs-bg:     rgba(255,255,255,0.05);
+    --cd-btnxs-hover:  rgba(255,255,255,0.1);
+    --cd-prob-track:   rgba(255,255,255,0.06);
+    --cd-thresh-mark:  rgba(255,255,255,0.35);
+    --cd-scroll-thumb: rgba(255,255,255,0.1);
+    --cd-dot-idle:     #475569;
+    --cd-green:        #22c55e;
+    --cd-red:          #ef4444;
+    --cd-amber:        #f59e0b;
+    --cd-blue:         #60a5fa;
+    --cd-purple:       #a78bfa;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── Overlay ── */
+.cd-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--cd-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: background 0.25s;
+}
+
+.cd-perm-card {
+    background: var(--cd-card-bg);
+    border: 1px solid var(--cd-card-border);
+    border-radius: 20px;
+    padding: 52px 48px;
+    max-width: 460px;
+    width: 90%;
+    text-align: center;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 60px rgba(96,165,250,0.08), var(--cd-card-shadow);
+}
+
+.cd-mic-icon {
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.cd-perm-card h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 10px;
+    background: linear-gradient(135deg, var(--cd-blue), var(--cd-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cd-perm-card p {
+    color: var(--cd-dim);
+    margin: 0 0 28px;
+    line-height: 1.65;
+    font-size: 0.92rem;
+}
+
+/* ── App shell ── */
+.cd-app {
+    padding: 24px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ── Header ── */
+.cd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.cd-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, var(--cd-blue), var(--cd-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cd-subtitle {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--cd-dim);
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+}
+
+.cd-header-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ── Cards ── */
+.cd-card {
+    background: var(--cd-card-bg);
+    border: 1px solid var(--cd-card-border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--cd-card-shadow);
+    transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.cd-card-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--cd-dim);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.cd-card-hdr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.cd-card-hdr .cd-card-label { margin-bottom: 0; }
+
+/* ── Waveform ── */
+#waveCanvas {
+    width: 100%;
+    height: 130px;
+    display: block;
+    border-radius: 8px;
+    background: var(--cd-wave-bg);
+    transition: background 0.25s;
+}
+
+/* ── Status row ── */
+.cd-status-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* ── Probability ── */
+.cd-prob-track {
+    background: var(--cd-prob-track);
+    border-radius: 6px;
+    height: 18px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.cd-prob-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--cd-green);
+    border-radius: 6px;
+    transition: width 0.12s ease, background-color 0.12s ease;
+}
+
+/* threshold marker */
+.cd-prob-track::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: var(--thresh-pct, 80%);
+    width: 2px;
+    height: 100%;
+    background: var(--cd-thresh-mark);
+}
+
+.cd-prob-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+#probValue {
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+
+.cd-thresh-lbl {
+    font-size: 0.72rem;
+    color: var(--cd-dim);
+}
+
+/* ── Indicator ── */
+.cd-indicator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0 6px;
+}
+
+.cd-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--cd-dot-idle);
+    transition: background 0.2s;
+}
+
+.cd-ind-ok    .cd-dot { background: var(--cd-green); box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+.cd-ind-cough .cd-dot {
+    background: var(--cd-red);
+    animation: pulse-dot 0.7s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%,100% { box-shadow: 0 0 0 0   rgba(220,38,38,0.6); }
+    50%      { box-shadow: 0 0 0 10px rgba(220,38,38,0); }
+}
+
+#indText {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.cd-ind-ok    #indText { color: var(--cd-green); }
+.cd-ind-cough #indText { color: var(--cd-red); }
+.cd-ind-idle  #indText { color: var(--cd-dim); }
+
+.cd-last-det {
+    font-size: 0.72rem;
+    color: var(--cd-dim);
+    min-height: 1.1em;
+}
+
+/* ── Cough log ── */
+.cd-log {
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--cd-scroll-thumb) transparent;
+}
+
+.cd-empty {
+    color: var(--cd-dim);
+    font-size: 0.82rem;
+    text-align: center;
+    padding: 28px 0;
+}
+
+.cd-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--cd-card-border);
+}
+
+.cd-entry:last-child { border-bottom: none; }
+
+.cd-entry-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(220,38,38,0.1);
+    border: 1px solid rgba(220,38,38,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--cd-red);
+    flex-shrink: 0;
+}
+
+.cd-entry-info { flex: 1; min-width: 0; }
+.cd-entry-time { font-size: 0.82rem; font-weight: 600; }
+.cd-entry-prob { font-size: 0.7rem; color: var(--cd-dim); }
+
+.cd-badge {
+    background: rgba(220,38,38,0.1);
+    color: var(--cd-red);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+/* ── Buttons ── */
+.cd-btn {
+    background: linear-gradient(135deg, var(--cd-blue), var(--cd-purple));
+    border: none;
+    border-radius: 9px;
+    color: #fff;
+    padding: 8px 20px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.cd-btn:hover  { opacity: 0.88; }
+.cd-btn:active { transform: scale(0.97); }
+.cd-btn.stop   { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+/* ── Theme toggle ── */
+.cd-btn-icon {
+    background: var(--cd-btnxs-bg);
+    border: 1px solid var(--cd-card-border);
+    border-radius: 9px;
+    color: var(--cd-dim);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.cd-btn-icon:hover { background: var(--cd-btnxs-hover); color: var(--cd-text); }
+
+/* sun shown in dark, moon shown in light */
+body.cd-body          .icon-sun  { display: none; }
+body.cd-body          .icon-moon { display: block; }
+body.cd-body[data-theme="dark"] .icon-sun  { display: block; }
+body.cd-body[data-theme="dark"] .icon-moon { display: none; }
+
+.cd-btn-xs {
+    background: var(--cd-btnxs-bg);
+    border: 1px solid var(--cd-card-border);
+    border-radius: 7px;
+    color: var(--cd-dim);
+    padding: 4px 12px;
+    font-size: 0.73rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.cd-btn-xs:hover { background: var(--cd-btnxs-hover); color: var(--cd-text); }
+
+.cd-btn-play {
+    background: rgba(22,163,74,0.09);
+    border: 1px solid rgba(22,163,74,0.25);
+    border-radius: 7px;
+    color: var(--cd-green);
+    padding: 5px 12px;
+    font-size: 0.73rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.cd-btn-play:hover   { background: rgba(22,163,74,0.18); }
+.cd-btn-play.playing {
+    background: rgba(220,38,38,0.1);
+    border-color: rgba(220,38,38,0.3);
+    color: var(--cd-red);
+}
+
+.cd-select {
+    background: var(--cd-select-bg);
+    border: 1px solid var(--cd-card-border);
+    border-radius: 9px;
+    color: var(--cd-text);
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    max-width: 240px;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.25s, border-color 0.25s;
+}
+
+.cd-select:focus { border-color: rgba(96,165,250,0.4); }
+
+/* ── Responsive ── */
+@media (max-width: 580px) {
+    .cd-status-row { grid-template-columns: 1fr; }
+}

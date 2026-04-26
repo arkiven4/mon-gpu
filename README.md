@@ -28,6 +28,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable gpu-monitor-server
 sudo systemctl start gpu-monitor-server
 
+sudo systemctl restart gpu-monitor-server
+sudo systemctl stop gpu-monitor-server
+
 # show status
 sudo systemctl status gpu-monitor-server
 ```
