@@ -7,7 +7,7 @@ the default port is `8081`.
 ```bash
 sudo apt install python3-flask
 
-sudo vim /etc/systemd/system/gpu-monitor-server.service
+sudo nano /etc/systemd/system/gpu-monitor-server.service
 ```
 
 ```config
@@ -39,10 +39,10 @@ sudo systemctl status gpu-monitor-server
 ```bash
 sudo apt install python3-requests python3-pynvml
 
-sudo crontab -e
+sudo EDITOR=nano crontab -e
 
 # add the following line to crontab; the --remark is optional
-* * * * * /usr/bin/python3 /path/to/client.py --server_ip serverIP:Port --remark Example-remark
+* * * * * /usr/bin/python3 /home/viblab/mon-gpu/client.py --server v-planck-pc3.local:5090 --remark Example-remark
 
 # if server 232 is still running:
 # * * * * * /usr/bin/python3 /path/to/client.py --server_ip 163.221.176.232:8081 --remark Example-remark
